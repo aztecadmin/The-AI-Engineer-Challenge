@@ -1,134 +1,149 @@
-import { useState, useRef, useEffect } from 'react'
-import { Send, Settings, MessageSquare, User, Bot } from 'lucide-react'
-import MessageBubble from './MessageBubble'
-import { Message } from '@/types'
+import { useState, useRef, useEffect } from "react";
+import { Send, Settings, MessageSquare, User, Bot } from "lucide-react";
+import MessageBubble from "./MessageBubble";
+import { Message } from "@/types";
 
 interface ChatInterfaceProps {
-  apiKey: string
-  onApiKeyReset: () => void
+  apiKey: string;
+  onApiKeyReset: () => void;
 }
 
-export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [userMessage, setUserMessage] = useState('')
-  const [developerMessage, setDeveloperMessage] = useState('You are a helpful AI assistant. Please provide clear and helpful responses.')
-  const [model, setModel] = useState('gpt-4.1-mini')
-  const [isLoading, setIsLoading] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+export default function ChatInterface({
+  apiKey,
+  onApiKeyReset,
+}: ChatInterfaceProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userMessage, setUserMessage] = useState("");
+  const [developerMessage, setDeveloperMessage] = useState(
+    "You are a helpful AI assistant. Please provide clear and helpful responses."
+  );
+  const [model, setModel] = useState("gpt-4.1-mini");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!userMessage.trim() || isLoading) return
+    e.preventDefault();
+
+    if (!userMessage.trim() || isLoading) return;
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: userMessage,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    };
 
-    setMessages(prev => [...prev, newUserMessage])
-    setUserMessage('')
-    setIsLoading(true)
+    setMessages((prev) => [...prev, newUserMessage]);
+    setUserMessage("");
+    setIsLoading(true);
 
     // Create assistant message with streaming content
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: '',
+      role: "assistant",
+      content: "",
       timestamp: new Date(),
-      isStreaming: true
-    }
+      isStreaming: true,
+    };
 
-    setMessages(prev => [...prev, assistantMessage])
+    setMessages((prev) => [...prev, assistantMessage]);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          developer_message: developerMessage,
-          user_message: userMessage,
-          model,
-          api_key: apiKey
-        })
-      })
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            developer_message: developerMessage,
+            user_message: userMessage,
+            model,
+            api_key: apiKey,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       if (!response.body) {
-        throw new Error('No response body')
+        throw new Error("No response body");
       }
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
 
       while (true) {
-        const { done, value } = await reader.read()
+        const { done, value } = await reader.read();
 
-        if (done) break
+        if (done) break;
 
-        const chunk = decoder.decode(value)
-        
-        setMessages(prev => prev.map(msg => 
-          msg.id === assistantMessage.id 
-            ? { ...msg, content: msg.content + chunk }
-            : msg
-        ))
+        const chunk = decoder.decode(value);
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessage.id
+              ? { ...msg, content: msg.content + chunk }
+              : msg
+          )
+        );
       }
 
       // Mark streaming as complete
-      setMessages(prev => prev.map(msg => 
-        msg.id === assistantMessage.id 
-          ? { ...msg, isStreaming: false }
-          : msg
-      ))
-
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessage.id ? { ...msg, isStreaming: false } : msg
+        )
+      );
     } catch (error) {
-      console.error('Chat error:', error)
-      setMessages(prev => prev.map(msg => 
-        msg.id === assistantMessage.id 
-          ? { 
-              ...msg, 
-              content: 'Sorry, there was an error processing your request. Please try again.',
-              isStreaming: false,
-              isError: true
-            }
-          : msg
-      ))
+      console.error("Chat error:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessage.id
+            ? {
+                ...msg,
+                content:
+                  "Sorry, there was an error processing your request. Please try again.",
+                isStreaming: false,
+                isError: true,
+              }
+            : msg
+        )
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e as any)
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
     }
-  }
+  };
 
   const handleTextareaResize = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px'
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        Math.min(textareaRef.current.scrollHeight, 120) + "px";
     }
-  }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border overflow-hidden">
@@ -143,7 +158,7 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
             <p className="text-xs text-muted-foreground">{model}</p>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -176,9 +191,11 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
               <option value="gpt-3.5-turbo">GPT-3.5-turbo</option>
             </select>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-2">System Message</label>
+            <label className="block text-sm font-medium mb-2">
+              System Message
+            </label>
             <textarea
               value={developerMessage}
               onChange={(e) => setDeveloperMessage(e.target.value)}
@@ -197,7 +214,9 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
             <div className="text-center text-muted-foreground">
               <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">Ready to chat!</h3>
-              <p className="text-sm">Start a conversation by typing a message below.</p>
+              <p className="text-sm">
+                Start a conversation by typing a message below.
+              </p>
             </div>
           </div>
         ) : (
@@ -218,18 +237,18 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
               ref={textareaRef}
               value={userMessage}
               onChange={(e) => {
-                setUserMessage(e.target.value)
-                handleTextareaResize()
+                setUserMessage(e.target.value);
+                handleTextareaResize();
               }}
               onKeyDown={handleKeyDown}
               placeholder="Type your message... (Shift+Enter for new line)"
               disabled={isLoading}
               rows={1}
               className="w-full px-4 py-3 pr-12 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring focus:border-transparent outline-none resize-none transition-colors"
-              style={{ minHeight: '48px', maxHeight: '120px' }}
+              style={{ minHeight: "48px", maxHeight: "120px" }}
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={!userMessage.trim() || isLoading}
@@ -238,7 +257,7 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
             <Send className="w-4 h-4" />
           </button>
         </div>
-        
+
         <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
           <span>Press Enter to send, Shift+Enter for new line</span>
           {isLoading && (
@@ -250,5 +269,5 @@ export default function ChatInterface({ apiKey, onApiKeyReset }: ChatInterfacePr
         </div>
       </form>
     </div>
-  )
+  );
 }

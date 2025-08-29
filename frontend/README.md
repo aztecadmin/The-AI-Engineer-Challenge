@@ -21,21 +21,25 @@ A beautiful, modern chat interface built with Next.js and TypeScript for interac
 ## Installation
 
 1. **Navigate to the frontend directory:**
+
    ```bash
    cd frontend
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables:**
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Edit `.env.local` and update the API URL if needed:
+
    ```
    NEXT_PUBLIC_API_URL=http://localhost:8000
    ```
@@ -45,6 +49,7 @@ A beautiful, modern chat interface built with Next.js and TypeScript for interac
 ### Development Mode
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -54,6 +59,7 @@ The application will be available at `http://localhost:3000`
 ### Production Build
 
 1. **Build the application:**
+
    ```bash
    npm run build
    ```
@@ -70,10 +76,12 @@ The application will be available at `http://localhost:3000`
 2. **Open the Frontend**: Navigate to `http://localhost:3000` in your browser
 
 3. **Enter API Key**: On first visit, you'll be prompted to enter your OpenAI API key
+
    - Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
    - The key is stored securely in your browser session only
 
-4. **Start Chatting**: 
+4. **Start Chatting**:
+
    - Type your message in the input field
    - Press Enter to send (Shift+Enter for new lines)
    - Watch as the AI responds in real-time with streaming
@@ -97,11 +105,13 @@ This frontend is optimized for deployment on Vercel:
 ### Manual Deployment
 
 1. **Build the application:**
+
    ```bash
    npm run build
    ```
 
 2. **Export static files** (optional):
+
    ```bash
    npm run export
    ```
@@ -136,6 +146,7 @@ frontend/
 ### Styling
 
 The application uses Tailwind CSS with a custom design system:
+
 - Proper contrast ratios for accessibility
 - Responsive breakpoints for mobile-first design
 - Dark/light theme variables
@@ -146,16 +157,19 @@ The application uses Tailwind CSS with a custom design system:
 ### Common Issues
 
 1. **"Backend server is not accessible"**
+
    - Ensure the FastAPI backend is running on the correct port
    - Check that CORS is properly configured in the backend
    - Verify the `NEXT_PUBLIC_API_URL` environment variable
 
 2. **API Key Issues**
+
    - Ensure your OpenAI API key starts with "sk-"
    - Check that you have sufficient credits in your OpenAI account
    - Verify the key has the necessary permissions
 
 3. **Build Errors**
+
    - Run `npm install` to ensure all dependencies are installed
    - Check for TypeScript errors with `npm run lint`
    - Ensure Node.js version is 18.0 or higher
@@ -190,6 +204,7 @@ The application uses Tailwind CSS with a custom design system:
 ## Support
 
 For issues and questions:
+
 1. Check the troubleshooting section above
 2. Verify the backend API is working correctly
 3. Check browser console for error messages

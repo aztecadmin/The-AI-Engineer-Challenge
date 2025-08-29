@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import ChatInterface from '@/components/ChatInterface'
-import ApiKeySetup from '@/components/ApiKeySetup'
+import { useState } from "react";
+import ChatInterface from "@/components/ChatInterface";
+import ApiKeySetup from "@/components/ApiKeySetup";
 
 export default function Home() {
-  const [apiKey, setApiKey] = useState<string>('')
-  const [isApiKeySet, setIsApiKeySet] = useState<boolean>(false)
+  const [apiKey, setApiKey] = useState<string>("");
+  const [isApiKeySet, setIsApiKeySet] = useState<boolean>(false);
 
   const handleApiKeySubmit = (key: string) => {
-    setApiKey(key)
-    setIsApiKeySet(true)
-  }
+    setApiKey(key);
+    setIsApiKeySet(true);
+  };
 
   const handleApiKeyReset = () => {
-    setApiKey('')
-    setIsApiKeySet(false)
-  }
+    setApiKey("");
+    setIsApiKeySet(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -33,14 +33,14 @@ export default function Home() {
             {!isApiKeySet ? (
               <ApiKeySetup onApiKeySubmit={handleApiKeySubmit} />
             ) : (
-              <ChatInterface 
-                apiKey={apiKey} 
-                onApiKeyReset={handleApiKeyReset} 
+              <ChatInterface
+                apiKey={apiKey}
+                onApiKeyReset={handleApiKeyReset}
               />
             )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

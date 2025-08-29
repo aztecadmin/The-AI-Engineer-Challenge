@@ -1,47 +1,55 @@
-import { useState } from 'react'
-import { Eye, EyeOff, Key, AlertCircle } from 'lucide-react'
+import { useState } from "react";
+import { Eye, EyeOff, Key, AlertCircle } from "lucide-react";
 
 interface ApiKeySetupProps {
-  onApiKeySubmit: (apiKey: string) => void
+  onApiKeySubmit: (apiKey: string) => void;
 }
 
 export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
-  const [apiKey, setApiKey] = useState('')
-  const [showApiKey, setShowApiKey] = useState(false)
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!apiKey.trim()) {
-      setError('Please enter your OpenAI API key')
-      return
+      setError("Please enter your OpenAI API key");
+      return;
     }
 
-    if (!apiKey.startsWith('sk-')) {
-      setError('Invalid API key format. OpenAI API keys start with "sk-"')
-      return
+    if (!apiKey.startsWith("sk-")) {
+      setError('Invalid API key format. OpenAI API keys start with "sk-"');
+      return;
     }
 
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
       // Test the API key by making a health check to the backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/health`)
-      
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/health`
+      );
+
       if (!response.ok) {
-        throw new Error('Backend server is not accessible. Please ensure the API server is running.')
+        throw new Error(
+          "Backend server is not accessible. Please ensure the API server is running."
+        );
       }
 
-      onApiKeySubmit(apiKey.trim())
+      onApiKeySubmit(apiKey.trim());
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to validate API key')
+      setError(
+        err instanceof Error ? err.message : "Failed to validate API key"
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -65,7 +73,7 @@ export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
               <div className="relative">
                 <input
                   id="apiKey"
-                  type={showApiKey ? 'text' : 'password'}
+                  type={showApiKey ? "text" : "password"}
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
@@ -99,17 +107,20 @@ export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
               disabled={isLoading || !apiKey.trim()}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 rounded-md font-medium transition-colors"
             >
-              {isLoading ? 'Validating...' : 'Start Chatting'}
+              {isLoading ? "Validating..." : "Start Chatting"}
             </button>
           </form>
 
           <div className="mt-6 text-center text-xs text-muted-foreground">
-            <p>Your API key is stored securely in your browser session and never sent to our servers.</p>
+            <p>
+              Your API key is stored securely in your browser session and never
+              sent to our servers.
+            </p>
             <p className="mt-1">
-              Don't have an API key?{' '}
-              <a 
-                href="https://platform.openai.com/api-keys" 
-                target="_blank" 
+              Don't have an API key?{" "}
+              <a
+                href="https://platform.openai.com/api-keys"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"
               >
@@ -120,5 +131,5 @@ export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
