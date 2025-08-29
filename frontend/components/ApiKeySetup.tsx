@@ -112,10 +112,6 @@ export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
           </form>
 
           <div className="mt-6 text-center text-xs text-muted-foreground">
-            <p>
-              Your API key is stored securely in your browser session and never
-              sent to our servers.
-            </p>
             <p className="mt-1">
               Don't have an API key?{" "}
               <a
